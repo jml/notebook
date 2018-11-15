@@ -7,7 +7,7 @@ name = "pypi"
 mako = "*"
 pygments = "*"
 markdown = "*"
-drmnotes = {editable = true, path = "."}
+jmlnotes = {editable = true, path = "."}
 ipython = "*"
 "beautifulsoup4" = "*"
 feedgen = "*"

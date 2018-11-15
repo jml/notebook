@@ -11,18 +11,18 @@ SOURCE = local_file("src")
 README = local_file("README.md")
 
 setuptools.setup(
-    name="drmnotes",
+    name="jmlnotes",
     # Not actually published on pypi
     version='0.0.0',
-    author="David R. MacIver",
-    author_email="david@drmaciver.com",
+    author="Jonathan M. Lange",
+    author_email="jml@mumak.net",
     packages=setuptools.find_packages(SOURCE),
     package_dir={"": SOURCE},
-    url=("https://github.com/DRMacIver/each/"),
+    url=("https://github.com/jml/notebook/"),
     license="GPL v3",
-    description="A tool for running programs on many inputs",
+    description="jml's notebook",
     zip_safe=False,
     install_requires=["attrs>=18.0.0", "click",],
-    entry_points={"console_scripts": ["drmnotes=drmnotes.__main__:main"]},
+    entry_points={"console_scripts": ["jmlnotes=jmlnotes.__main__:main"]},
     long_description=open(README).read(),
 )

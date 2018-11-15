@@ -16,6 +16,9 @@ from markdown.inlinepatterns import HtmlPattern, SimpleTagPattern
 import dateutil
 
 
+SITE_URL = 'https://notes.jml.io'
+
+
 def git(*args):
     subprocess.check_call(["git", *args])
 
@@ -65,6 +68,7 @@ def main():
 
 POST_DATE_FORMAT = '%Y-%m-%d-%H:%M'
 
+
 def contents(filename):
     try:
         with open(filename) as i:
@@ -95,7 +99,7 @@ def edit_and_commit_post(name):
 @main.command(name='new-post')
 def new_post():
     now = datetime.now()
-    name = now.strftime(POST_DATE_FORMAT) 
+    name = now.strftime(POST_DATE_FORMAT)
     edit_and_commit_post(name)
 
 
@@ -109,10 +113,10 @@ def edit_post(name):
     edit_and_commit_post(name)
 
 
-
 class MathJaxExtension(markdown.Extension):
     def extendMarkdown(self, md, md_globals):
-        # Needs to come before escape matching because \ is pretty important in LaTeX
+        # Needs to come before escape matching because \ is pretty important
+        # in LaTeX
         md.inlinePatterns.add('mathjax', MathJaxPattern(md), '<escape')
 
 
@@ -135,13 +139,16 @@ LATEX_EXPR = r"(\\\(.+?\\\))"
 DEL_RE = r'(~~)(.*?)~~'
 
 
-
 class MathJaxAlignExtension(markdown.Extension):
     def extendMarkdown(self, md, md_globals):
-        # Needs to come before escape matching because \ is pretty important in LaTeX
-        md.inlinePatterns.add('mathjaxblocks', HtmlPattern(LATEX_BLOCK, md), '<escape')
-        md.inlinePatterns.add('mathjaxexprs', HtmlPattern(LATEX_EXPR, md), '<escape')
-        md.inlinePatterns.add('del', SimpleTagPattern(DEL_RE, 'del') , '>not_strong')
+        # Needs to come before escape matching because \ is pretty important
+        # in LaTeX
+        md.inlinePatterns.add(
+            'mathjaxblocks', HtmlPattern(LATEX_BLOCK, md), '<escape')
+        md.inlinePatterns.add(
+            'mathjaxexprs', HtmlPattern(LATEX_EXPR, md), '<escape')
+        md.inlinePatterns.add(
+            'del', SimpleTagPattern(DEL_RE, 'del'), '>not_strong')
 
 
 def md(text):
@@ -260,38 +267,38 @@ def do_build(rebuild=False, full=True, name=''):
 
     posts.sort(key=lambda p: p.name, reverse=True)
 
-
     with open(INDEX_PAGE, 'w') as o:
         o.write(TEMPLATE_LOOKUP.get_template('index.html').render(
-            posts=posts, title="Thoughts from David R. MacIver",
+            posts=posts, title="Thoughts from Jonathan M. Lange",
         ))
 
-
     fg = FeedGenerator()
-    fg.id('https://notebook.drmaciver.com/')
-    fg.title("DRMacIver's notebook")
-    fg.author( {'name':'David R. MacIver','email':'david@drmaciver.com'} )
-    fg.link(href='https://notebook.drmaciver.com', rel='alternate')
-    fg.link(href='https://notebook.drmaciver.com/feed.xml', rel='self')
+    fg.id('%s/' % SITE_URL)
+    fg.title("jml's notebook")
+    fg.author({'name': 'Jonathan M. Lange', 'email': 'jml@mumak.net'})
+    fg.link(href=SITE_URL, rel='alternate')
+    fg.link(href='%s/feed.xml' % (SITE_URL,), rel='self')
     fg.language('en')
 
     dates = []
 
     for post in reversed(posts):
         fe = fg.add_entry()
-        fe.id('https://notebook.drmaciver.com' + post.url)
-        fe.link(href='https://notebook.drmaciver.com' + post.url)
+        fe.id(SITE_URL + post.url)
+        fe.link(href=SITE_URL + post.url)
         fe.title(post.title or post.name)
         fe.content(post.body)
         updated = subprocess.check_output([
-        "git", "log", "-1", '--date=iso8601', '--format="%ad"', "--", post.original_file,
+            "git", "log", "-1", '--date=iso8601', '--format="%ad"', "--",
+            post.original_file,
         ]).decode('ascii').strip().strip('"')
         if updated:
             updated = dateutil.parser.parse(updated)
         else:
-            updated = datetime.strptime(post.name.replace('.html', ''), POST_DATE_FORMAT).replace(
-                tzinfo=tz.gettz()
-            )
+            updated = datetime.strptime(
+                post.name.replace('.html', ''), POST_DATE_FORMAT).replace(
+                    tzinfo=tz.gettz()
+                )
         dates.append(updated)
         fe.updated(updated)
 
