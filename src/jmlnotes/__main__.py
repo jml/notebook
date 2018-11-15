@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import attr
 import cgi
 from feedgen.feed import FeedGenerator
+import shutil
 import subprocess
 from dateutil import tz
 import re
@@ -46,7 +47,11 @@ CACHE_DIR = os.path.join(ROOT, '.cache')
 TEMPLATES = os.path.join(ROOT, 'templates')
 POSTS = os.path.join(ROOT, 'posts')
 
-HTML_ROOT = os.path.join(ROOT, 'docs')
+STATIC_SOURCE = os.path.join(ROOT, 'static')
+
+HTML_ROOT = os.path.join(ROOT, 'output')
+
+HTML_STATIC_DEST = os.path.join(HTML_ROOT, 'static')
 
 INDEX_PAGE = os.path.join(HTML_ROOT, 'index.html')
 
@@ -90,9 +95,7 @@ def edit_and_commit_post(name):
         return
 
     do_build(rebuild=False)
-    files = [post_file, os.path.join(HTML_POSTS, name + '.html')]
-    git("add", *files)
-    git("add", "-u", HTML_ROOT)
+    git("add", post_file)
     git("commit", "-m", "Add new post %r" % (name,))
 
 
@@ -189,6 +192,13 @@ def do_build(rebuild=False, full=True, name=''):
         os.makedirs(HTML_POSTS)
     except FileExistsError:
         pass
+
+    try:
+        shutil.rmtree(HTML_STATIC_DEST)
+    except FileNotFoundError:
+        pass
+
+    shutil.copytree(STATIC_SOURCE, HTML_STATIC_DEST)
 
     for source in glob(os.path.join(POSTS, '*.md')):
         name = os.path.basename(source)
