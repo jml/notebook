@@ -18,7 +18,13 @@ install:
 
 script:
   - pipenv run jmlnotes build
-  - pipenv run aws s3 sync --acl public-read --delete output/ s3://notes.jml.io
+
+deploy:
+  provider: s3
+  bucket: "notes.jml.io"
+  skip_cleanup: true
+  local_dir: output
+  acl: public_read
 
 notifications:
   email:
@@ -26,3 +32,8 @@ notifications:
       - jml@mumak.net
     on_success: never
     on_failure: never
+
+stages:
+  - name: deploy
+    # require the branch name to be master (note for PRs this is the base branch name)
+    if: branch = master
