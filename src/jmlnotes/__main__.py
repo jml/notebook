@@ -12,7 +12,6 @@ from feedgen.feed import FeedGenerator
 import shutil
 import subprocess
 from dateutil import tz
-import re
 from markdown.inlinepatterns import HtmlPattern, SimpleTagPattern
 import dateutil
 
@@ -158,21 +157,12 @@ def md(text):
     return markdown.markdown(
         text, extensions=[
             MathJaxAlignExtension(),
-            'markdown.extensions.fenced_code',
             'markdown.extensions.codehilite',
+            'markdown.extensions.fenced_code',
+            'markdown.extensions.footnotes',
+            'markdown.extensions.smarty',
         ]
     )
-
-
-PULL_IN_TAGS = re.compile("\s+</", re.MULTILINE)
-PULL_IN_FULL_STOP = re.compile(r">\s+\.", re.MULTILINE)
-
-
-def clean_html(soup):
-    html = soup.prettify()
-    html = PULL_IN_TAGS.sub("</", html)
-    html = PULL_IN_FULL_STOP.sub(">.", html)
-    return html
 
 
 @main.command()
@@ -205,7 +195,7 @@ def build_html(name, source, dest, post_template):
 
     with open(dest, 'w') as o:
         o.write(post_template.render(
-            post=clean_html(soup),
+            post=str(soup),
             title=title,
             date=date.strftime('%Y-%m-%d'),
         ))
