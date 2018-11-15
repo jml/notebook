@@ -52,7 +52,7 @@ INDEX_PAGE = os.path.join(HTML_ROOT, 'index.html')
 
 HTML_POSTS = os.path.join(HTML_ROOT, 'posts')
 
-EDITOR = 'vim'
+EDITOR = ['emacsclient', '-c']
 
 
 TEMPLATE_LOOKUP = TemplateLookup(
@@ -84,7 +84,7 @@ def edit_and_commit_post(name):
 
     prev = contents(post_file)
 
-    call([EDITOR, post_file])
+    call(EDITOR + [post_file])
 
     if contents(post_file) == prev:
         return
