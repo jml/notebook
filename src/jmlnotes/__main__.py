@@ -183,66 +183,39 @@ def build(rebuild, full, name):
     do_build(rebuild, full, name)
 
 
-def do_build(rebuild=False, full=True, name=''):
-    post_template = TEMPLATE_LOOKUP.get_template("post.html")
+def build_html(name, source, dest, post_template):
+    with open(source) as i:
+        source_text = i.read()
 
-    only = name
+    source_html = md(source_text)
+    soup = BeautifulSoup(source_html, 'html.parser')
 
-    try:
-        os.makedirs(HTML_POSTS)
-    except FileExistsError:
-        pass
+    title_elt = soup.find("h1")
+    if title_elt is None:
+        title = None
+    else:
+        title = ' '.join(map(str, title_elt.contents))
+        title_elt.decompose()
 
-    try:
-        shutil.rmtree(HTML_STATIC_DEST)
-    except FileNotFoundError:
-        pass
+    for d in [3, 2]:
+        for f in soup.findAll('h%d' % (d,)):
+            f.name = 'h%d' % (d + 1,)
 
-    shutil.copytree(STATIC_SOURCE, HTML_STATIC_DEST)
+    date = datetime.strptime(name.replace('.md', ''), POST_DATE_FORMAT)
 
-    for source in glob(os.path.join(POSTS, '*.md')):
-        name = os.path.basename(source)
-        if not name.startswith(only):
-            continue
-        dest = os.path.join(HTML_POSTS, name.replace('.md', '.html'))
+    with open(dest, 'w') as o:
+        o.write(post_template.render(
+            post=clean_html(soup),
+            title=title,
+            date=date.strftime('%Y-%m-%d'),
+        ))
 
-        if not (
-            rebuild or
-            not os.path.exists(dest) or
-            os.path.getmtime(source) > os.path.getmtime(dest)
-        ):
-            continue
 
-        with open(source) as i:
-            source_text = i.read()
+def out_of_date(source, dest):
+    return os.path.exists(dest) or os.path.getmtime(source) > os.path.getmtime(dest)
 
-        source_html = md(source_text)
-        soup = BeautifulSoup(source_html, 'html.parser')
 
-        title_elt = soup.find("h1")
-
-        if title_elt is None:
-            title = None
-        else:
-            title = ' '.join(map(str, title_elt.contents))
-            title_elt.decompose()
-
-        for d in [3, 2]:
-            for f in soup.findAll('h%d' % (d,)):
-                f.name = 'h%d' % (d + 1,)
-
-        date = datetime.strptime(name.replace('.md', ''), POST_DATE_FORMAT)
-
-        with open(dest, 'w') as o:
-            o.write(post_template.render(
-                post=clean_html(soup),
-                title=title,
-                date=date.strftime('%Y-%m-%d'),
-            ))
-
-    if not full:
-        return
-
+def remove_deleted_posts():
     for post in glob(os.path.join(HTML_POSTS, "*.html")):
         source = os.path.join(
             POSTS, os.path.basename(post).replace('.html', '.md')
@@ -250,11 +223,12 @@ def do_build(rebuild=False, full=True, name=''):
         if not os.path.exists(source):
             os.unlink(post)
 
-    posts = []
 
+def iter_posts():
     for post in glob(os.path.join(HTML_POSTS, "*.html")):
         with open(post) as i:
             contents = i.read()
+
         soup = BeautifulSoup(contents, 'html.parser')
         title_elts = soup.select("p.subtitle")
 
@@ -267,21 +241,18 @@ def do_build(rebuild=False, full=True, name=''):
 
         date = soup.select('dd.post-date')[0].text.strip()
         url = '/posts/' + os.path.basename(post)
-        posts.append(Post(
+        yield Post(
             original_file=os.path.join(POSTS, name.replace('.html', '.md')),
             name=name,
-            date=date, url=url,
+            date=date,
+            url=url,
             body='\n'.join(map(str, soup.select('#the-post')[0].children)),
             title=title,
-        ))
+        )
 
-    posts.sort(key=lambda p: p.name, reverse=True)
 
-    with open(INDEX_PAGE, 'w') as o:
-        o.write(TEMPLATE_LOOKUP.get_template('index.html').render(
-            posts=posts, title="Thoughts from Jonathan M. Lange",
-        ))
 
+def generate_feed(posts):
     fg = FeedGenerator()
     fg.id('%s/' % SITE_URL)
     fg.title("jml's notebook")
@@ -315,3 +286,47 @@ def do_build(rebuild=False, full=True, name=''):
     fg.updated(max(dates))
 
     fg.atom_file(os.path.join(HTML_ROOT, 'feed.xml'), pretty=True)
+
+
+def do_build(rebuild=False, full=True, name=''):
+    post_template = TEMPLATE_LOOKUP.get_template("post.html")
+
+    only = name
+
+    try:
+        os.makedirs(HTML_POSTS)
+    except FileExistsError:
+        pass
+
+    try:
+        shutil.rmtree(HTML_STATIC_DEST)
+    except FileNotFoundError:
+        pass
+
+    shutil.copytree(STATIC_SOURCE, HTML_STATIC_DEST)
+
+    for source in glob(os.path.join(POSTS, '*.md')):
+        name = os.path.basename(source)
+        if not name.startswith(only):
+            continue
+        dest = os.path.join(HTML_POSTS, name.replace('.md', '.html'))
+
+        if not (rebuild or out_of_date(source, dest)):
+            continue
+
+        build_html(name, source, dest, post_template)
+
+    if not full:
+        return
+
+    remove_deleted_posts()
+
+    posts = list(iter_posts())
+    posts.sort(key=lambda p: p.name, reverse=True)
+
+    with open(INDEX_PAGE, 'w') as o:
+        o.write(TEMPLATE_LOOKUP.get_template('index.html').render(
+            posts=posts, title="Thoughts from Jonathan M. Lange",
+        ))
+
+    generate_feed(posts)
