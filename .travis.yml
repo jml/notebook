@@ -13,7 +13,10 @@ python:
   - "3.6"
 
 install:
-  - pip install --upgrade pip setuptools pipenv
+  # There's a mess around pyenv support in pythonfinder over the last couple
+  # of weeks (today is 2018-11-15), which pipenv vendors in. Skip to the
+  # pipenv before that so we get something that will build on Travis.
+  - pip install --upgrade pip setuptools pipenv==2018.10.13
   - pipenv install --dev --pre
 
 script:
