@@ -7,12 +7,13 @@ name = "pypi"
 mako = "*"
 pygments = "*"
 markdown = "*"
-jmlnotes = {editable = true, path = "."}
-ipython = "*"
+jmlnotes = {editable = true,path = "."}
 "beautifulsoup4" = "*"
 feedgen = "*"
 
 [dev-packages]
+ipython = "*"
+flake8 = "*"
 
 [requires]
 python_version = "3.6"

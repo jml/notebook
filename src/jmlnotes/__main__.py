@@ -202,7 +202,9 @@ def build_html(name, source, dest, post_template):
 
 
 def out_of_date(source, dest):
-    return os.path.exists(dest) or os.path.getmtime(source) > os.path.getmtime(dest)
+    return (
+        os.path.exists(dest)
+        or os.path.getmtime(source) > os.path.getmtime(dest))
 
 
 def remove_deleted_posts():
@@ -239,7 +241,6 @@ def iter_posts():
             body='\n'.join(map(str, soup.select('#the-post')[0].children)),
             title=title,
         )
-
 
 
 def generate_feed(posts):
