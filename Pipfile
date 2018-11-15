@@ -6,13 +6,15 @@ name = "pypi"
 [packages]
 mako = "*"
 pygments = "*"
-markdown = "*"
-drmnotes = {editable = true, path = "."}
-ipython = "*"
+markdown = "==2.*"
+jmlnotes = {editable = true,path = "."}
 "beautifulsoup4" = "*"
 feedgen = "*"
 
 [dev-packages]
+awscli = "*"
+flake8 = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.6"

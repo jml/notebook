@@ -1,3 +1,6 @@
 .cache
 *.swp
 *.egg-info
+/build
+/dist
+/output

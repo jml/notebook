@@ -9,10 +9,10 @@ DRMacIver's Notebook: ${title}
 DRMacIver's Notebook
 % endif
     </title>
-    <link rel="stylesheet" href="/pygments.css"/>
-    <link rel="stylesheet" href="/tufte.css"/>
-    <link rel="stylesheet" href="/latex.css"/>
-    <link rel="stylesheet" href="/drmnotes.css"/>
+    <link rel="stylesheet" href="/static/pygments.css"/>
+    <link rel="stylesheet" href="/static/tufte.css"/>
+    <link rel="stylesheet" href="/static/latex.css"/>
+    <link rel="stylesheet" href="/static/jmlnotes.css"/>
     <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -38,7 +38,7 @@ MathJax.Hub.Config({
 
   <body>
     <article>
-        <h1><a href="/">DRMacIver's Notebook</a></h1>
+        <h1><a href="/">jml's notebook</a></h1>
 % if title:
         <p class=subtitle>${title}</p>
 % endif
@@ -46,8 +46,9 @@ MathJax.Hub.Config({
         ${self.body()}
     </article>
 <footer>
-Copyright David R. MacIver.
+Copyright Jonathan M. Lange.
 
+Based on <a href="https://github.com/DRMacIver/notebook">DRMacIver's notebook</a>. Used with permission.
 CSS mostly due to <a href="https://edwardtufte.github.io/tufte-css/">Tufte CSS</a> by Dave Liepmann.
 </footer>
   </body>

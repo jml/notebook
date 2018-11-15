@@ -1,0 +1,42 @@
+language: python
+
+sudo: false
+
+env:
+    - PIPENV_IGNORE_VIRTUALENVS=1
+
+cache:
+    directories:
+        - $HOME/.cache/pip
+
+python:
+  - "3.6"
+
+install:
+  # There's a mess around pyenv support in pythonfinder over the last couple
+  # of weeks (today is 2018-11-15), which pipenv vendors in. Skip to the
+  # pipenv before that so we get something that will build on Travis.
+  - pip install --upgrade pip setuptools pipenv==2018.10.13
+  - pipenv install --dev --pre
+
+script:
+  - pipenv run jmlnotes build
+
+deploy:
+  provider: s3
+  bucket: "notes.jml.io"
+  skip_cleanup: true
+  local_dir: output
+  acl: public_read
+
+notifications:
+  email:
+    recipients:
+      - jml@mumak.net
+    on_success: never
+    on_failure: never
+
+stages:
+  - name: deploy
+    # require the branch name to be master (note for PRs this is the base branch name)
+    if: branch = master
