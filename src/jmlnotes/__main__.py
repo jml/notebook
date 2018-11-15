@@ -203,7 +203,7 @@ def build_html(name, source, dest, post_template):
 
 def out_of_date(source, dest):
     return (
-        os.path.exists(dest)
+        not os.path.exists(dest)
         or os.path.getmtime(source) > os.path.getmtime(dest))
 
 
