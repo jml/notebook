@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 mako = "*"
 pygments = "*"
-markdown = "*"
+markdown = "==2.*"
 jmlnotes = {editable = true,path = "."}
 "beautifulsoup4" = "*"
 feedgen = "*"
