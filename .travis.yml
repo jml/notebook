@@ -24,11 +24,11 @@ script:
 
 
 before_deploy:
-  pip install --user awscli
+  pip install awscli
 
 deploy:
   provider: script
-  script: ~/.local/bin/aws s3 sync output/ s3://notes.jml.io --acl public-read --delete
+  script: aws s3 sync output/ s3://notes.jml.io --acl public-read --delete
   skip_cleanup: true
 
 notifications:
