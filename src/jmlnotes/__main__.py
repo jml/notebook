@@ -74,6 +74,7 @@ POST_DATE_FORMAT = '%Y-%m-%d-%H:%M'
 
 
 def contents(filename):
+    """Return the contents of the file at 'filename'."""
     try:
         with open(filename) as i:
             return i.read()
@@ -202,6 +203,7 @@ def build_html(name, source, dest, post_template):
 
 
 def out_of_date(source, dest):
+    """Is the file 'dest' out-of-date, assuming it's built from 'source'?"""
     return (
         not os.path.exists(dest)
         or os.path.getmtime(source) > os.path.getmtime(dest))
@@ -217,6 +219,7 @@ def remove_deleted_posts():
 
 
 def iter_posts():
+    """Loop through all the generated posts, yielding 'Post' values."""
     for post in glob(os.path.join(HTML_POSTS, "*.html")):
         with open(post) as i:
             contents = i.read()
