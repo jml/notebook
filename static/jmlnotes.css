@@ -28,6 +28,8 @@ dl.metadata dd {
 
 #the-post p.subtitle { display: none; }
 
+h2 { counter-reset: sidenote-counter; }
+
 h4 { font-style: italic;
      font-weight: 400;
      font-size: 1.5rem;

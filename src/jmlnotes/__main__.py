@@ -15,6 +15,8 @@ from dateutil import tz
 from markdown.inlinepatterns import HtmlPattern, SimpleTagPattern
 import dateutil
 
+from . import _sidenotes
+
 
 SITE_URL = 'https://notes.jml.io'
 
@@ -160,7 +162,7 @@ def md(text):
             MathJaxAlignExtension(),
             'markdown.extensions.codehilite',
             'markdown.extensions.fenced_code',
-            'markdown.extensions.footnotes',
+            _sidenotes.SidenoteExtension(),
             'markdown.extensions.smarty',
         ]
     )
