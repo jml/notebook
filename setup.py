@@ -22,7 +22,15 @@ setuptools.setup(
     license="GPL v3",
     description="jml's notebook",
     zip_safe=False,
-    install_requires=["attrs>=18.0.0", "click",],
+    install_requires=[
+        "attrs>=18.0.0",
+        "beautifulsoup4",
+        "click",
+        "feedgen",
+        "mako",
+        "markdown",
+        "pygments",
+    ],
     entry_points={"console_scripts": ["jmlnotes=jmlnotes.__main__:main"]},
     long_description=open(README).read(),
 )
